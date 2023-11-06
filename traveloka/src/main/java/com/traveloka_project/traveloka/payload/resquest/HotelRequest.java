@@ -19,7 +19,7 @@ public class HotelRequest {
     private String name;
     private String address;
     private String description;
-    private String location;
+    private Integer locationId;
     private String checkInInstruction;
     private Boolean status = false;
     private Integer price;
@@ -31,7 +31,6 @@ public class HotelRequest {
         newHotel.setName(this.name);
         newHotel.setAddress(this.address);
         newHotel.setDescription(this.description);
-        newHotel.setLocation(this.location);
         newHotel.setCheckInInstruction(this.checkInInstruction);
         newHotel.setStatus(this.status);
         return newHotel;
@@ -42,7 +41,7 @@ public class HotelRequest {
         this.name = hotel.getName();
         this.address = hotel.getAddress();
         this.description = hotel.getDescription();
-        this.location = hotel.getLocation();
+        this.locationId = hotel.getLocation().getId();
         this.checkInInstruction = hotel.getCheckInInstruction();
         this.status = hotel.getStatus();
         return this;

@@ -3,7 +3,6 @@ package com.traveloka_project.traveloka.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +16,11 @@ import com.traveloka_project.traveloka.service.HotelService;
 
 @Service
 public class HotelServiceImpl implements HotelService {
-    @Autowired
-    private HotelRepository hotelRepository;
+    private final HotelRepository hotelRepository;
+
+    public HotelServiceImpl(HotelRepository hotelRepository) {
+        this.hotelRepository = hotelRepository;
+    }
 
     @Override
     public HotelRequest save(HotelRequest hotelRequest) {
@@ -30,7 +32,7 @@ public class HotelServiceImpl implements HotelService {
     public PaginationResponse<HotelRequest> findByLocation(Integer pageNum, Integer pageSize, String location) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         String lowerCaseString = location.toLowerCase();
-        Page<Hotel> pageHotel = hotelRepository.findByLocation(lowerCaseString, pageable);
+        Page<Hotel> pageHotel = hotelRepository.findByLocation_Name(lowerCaseString, pageable);
         List<HotelRequest> hotelRequests = pageHotel.getContent().stream()
                 .map(hotel -> {
                     HotelRequest hotelRequest = new HotelRequest();

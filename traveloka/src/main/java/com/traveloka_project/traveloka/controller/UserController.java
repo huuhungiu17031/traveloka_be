@@ -1,10 +1,8 @@
 package com.traveloka_project.traveloka.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,14 +20,15 @@ import com.traveloka_project.traveloka.service.UserService;
 @RestController
 @RequestMapping("user")
 public class UserController {
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private RefreshTokenService refreshTokenService;
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
+    
+    public UserController(UserService userService, JwtService jwtService, RefreshTokenService refreshTokenService) {
+        this.userService = userService;
+        this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
+    }
 
     @PostMapping("login")
     public ResponseEntity<BaseHttpResponse> login(@RequestBody UserRequest userRequest) {
@@ -45,8 +44,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("refreshToken/{refreshToken}")
-    public ResponseEntity<BaseHttpResponse> getRefreshToken(@PathVariable String refreshToken) {
+    @PostMapping("refreshToken")
+    public ResponseEntity<BaseHttpResponse> getRefreshToken(@RequestBody String refreshToken) {
         JwtResponse jwtResponse = jwtService.getNewJwtToken(refreshToken);
         BaseHttpResponse response = new BaseHttpResponse(HttpStatus.OK.value(), jwtResponse);
         return ResponseEntity.status(HttpStatus.OK).body(response);

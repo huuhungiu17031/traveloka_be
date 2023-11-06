@@ -3,7 +3,8 @@ package com.traveloka_project.traveloka.provider;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.traveloka_project.traveloka.exception.CommonException;
+import com.traveloka_project.traveloka.util.ErrorMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,20 +14,19 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.traveloka_project.traveloka.exception.NotFoundException;
 import com.traveloka_project.traveloka.model.Role;
 import com.traveloka_project.traveloka.model.User;
 import com.traveloka_project.traveloka.service.UserService;
 
 @Service
 public class CustomAuthenProvider implements AuthenticationProvider {
-    @Autowired
-    @Lazy
-    private UserService userService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    @Lazy
-    private PasswordEncoder passwordEncoder;
+    public CustomAuthenProvider(@Lazy UserService userService, @Lazy PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) {
@@ -45,7 +45,7 @@ public class CustomAuthenProvider implements AuthenticationProvider {
                     listRoles);
             return token;
         }
-        throw new NotFoundException("ErrorMessage.INVALID_ACCOUNT");
+        throw new CommonException(ErrorMessage.EMAIL_OR_PASSWORD_ERROR);
     }
 
     @Override

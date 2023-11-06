@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import com.traveloka_project.traveloka.exception.CommonException;
+import com.traveloka_project.traveloka.util.Constant;
+import com.traveloka_project.traveloka.util.ErrorMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.traveloka_project.traveloka.exception.NotFoundException;
 import com.traveloka_project.traveloka.model.Role;
 import com.traveloka_project.traveloka.model.User;
 import com.traveloka_project.traveloka.payload.response.JwtResponse;
@@ -27,22 +27,30 @@ import com.traveloka_project.traveloka.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UserRespository userRespository;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRespository userRespository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final RoleService roleService;
+    
+    public UserServiceImpl(
+            PasswordEncoder passwordEncoder,
+            UserRespository userRespository,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService,
+            RoleService roleService) {
+        this.passwordEncoder = passwordEncoder;
+        this.userRespository = userRespository;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.roleService = roleService;
+    }
 
     @Override
     public User findUserByEmail(String email) {
         Optional<User> optionalUser = userRespository.findByEmail(email);
         if (optionalUser.isEmpty())
-            throw new NotFoundException("Email not founded!");
+            throw new CommonException(ErrorMessage.EMAIL_OR_PASSWORD_ERROR);
         return optionalUser.get();
     }
 
@@ -60,7 +68,7 @@ public class UserServiceImpl implements UserService {
     public CreateUserRequest register(CreateUserRequest createUserRequest) {
         String encryptedPassword = passwordEncoder.encode(createUserRequest.getPassword());
         createUserRequest.setPassword(encryptedPassword);
-        Role role = roleService.findByRole("ROLE_USER");
+        Role role = roleService.findByRole(Constant.ROLE_USER);
         User newUser = createUserRequest.dto();
         List<Role> listRoles = new ArrayList<>();
         listRoles.add(role);

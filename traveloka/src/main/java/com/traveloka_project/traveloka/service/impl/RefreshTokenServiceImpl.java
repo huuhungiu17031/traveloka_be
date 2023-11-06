@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.traveloka_project.traveloka.util.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +29,13 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    private UserRespository userRespository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRespository userRespository;
+    
+    public RefreshTokenServiceImpl(RefreshTokenRepository refreshTokenRepository, UserRespository userRespository){
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.userRespository = userRespository;
+    }
     private final int refreshTokenDuration = 48 * 60 * 60 * 1000;
     @Value("${token.secrect.refreshKey}")
     private String JWT_REFRESH_TOKEN;
@@ -105,7 +108,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public RefreshToken handleGetNewRefreshToken(String token) {
         Optional<RefreshToken> optional = refreshTokenRepository.findByrefreshToken(token);
         if (optional.isEmpty())
-            throw new NotFoundException("Not Found Token");
+            throw new NotFoundException(ErrorMessage.generateNotFoundMessage("refresh token") + token);
         RefreshToken dbRefreshToken = optional.get();
         if (isTokenValid(dbRefreshToken.getRefreshToken())) {
             String email = extractEmail(token);
@@ -114,14 +117,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             return refreshTokenRepository.save(dbRefreshToken);
         }
         refreshTokenRepository.deleteById(dbRefreshToken.getId());
-        throw new CommonException("Sign in again");
+        throw new CommonException(ErrorMessage.SIGN_IN_AGAIN);
     }
 
     @Override
     public void provokeToken(String email) {
         Optional<RefreshToken> optional = refreshTokenRepository.findByUser_Email(email);
         if (optional.isEmpty())
-            throw new NotFoundException("Not Found Provoke Token");
+            throw new NotFoundException(ErrorMessage.generateNotFoundMessage("token"));
         RefreshToken dbRefreshToken = optional.get();
         refreshTokenRepository.deleteById(dbRefreshToken.getId());
     }

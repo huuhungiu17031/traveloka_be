@@ -1,6 +1,5 @@
 package com.traveloka_project.traveloka.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +17,16 @@ import com.traveloka_project.traveloka.service.HotelService;
 @RestController
 @RequestMapping("hotel")
 public class HotelController {
-    @Autowired
-    private HotelService hotelService;
-
+    private final HotelService hotelService;
+ 
+    public HotelController(HotelService hotelService){
+        this.hotelService = hotelService;
+    }
+    
     @PostMapping
     public ResponseEntity<BaseHttpResponse> createHotel(@RequestBody HotelRequest hotelRequest) {
-        HotelRequest newHotel = hotelService.save(hotelRequest);
-        BaseHttpResponse response = new BaseHttpResponse(HttpStatus.OK.value(), newHotel);
+        // HotelRequest newHotel = hotelService.save(hotelRequest);
+        BaseHttpResponse response = new BaseHttpResponse(HttpStatus.OK.value(), null);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

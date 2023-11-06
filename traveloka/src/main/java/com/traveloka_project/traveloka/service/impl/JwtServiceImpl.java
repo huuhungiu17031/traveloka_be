@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +27,15 @@ import io.jsonwebtoken.io.Decoders;
 
 @Service
 public class JwtServiceImpl implements JwtService {
-    @Autowired
-    private RefreshTokenService refreshTokenService;
+    private final RefreshTokenService refreshTokenService;
+    private final int accessTokenDuration = 48 * 60 * 60 * 1000;
+
+    public JwtServiceImpl(RefreshTokenService refreshTokenService) {
+        this.refreshTokenService = refreshTokenService;
+    }
+
     @Value("${token.secrect.keys}")
     private String JWT_SECRET;
-    private final int accessTokenDuration = 48 * 60 * 60 * 1000;
 
     private Key getSigningKey() {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(JWT_SECRET));
