@@ -1,13 +1,15 @@
 package com.traveloka_project.traveloka.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.traveloka_project.traveloka.payload.response.BaseHttpResponse;
 import com.traveloka_project.traveloka.payload.response.PaginationResponse;
@@ -18,15 +20,17 @@ import com.traveloka_project.traveloka.service.HotelService;
 @RequestMapping("hotel")
 public class HotelController {
     private final HotelService hotelService;
- 
-    public HotelController(HotelService hotelService){
+
+    public HotelController(HotelService hotelService) {
         this.hotelService = hotelService;
     }
-    
+
     @PostMapping
-    public ResponseEntity<BaseHttpResponse> createHotel(@RequestBody HotelRequest hotelRequest) {
-        // HotelRequest newHotel = hotelService.save(hotelRequest);
-        BaseHttpResponse response = new BaseHttpResponse(HttpStatus.OK.value(), null);
+    public ResponseEntity<BaseHttpResponse> createHotel(
+            @RequestParam List<MultipartFile> files,
+            @RequestParam(required = false) String hotelRequest) {
+        HotelRequest newHotel = hotelService.save(hotelRequest, files);
+        BaseHttpResponse response = new BaseHttpResponse(HttpStatus.OK.value(), newHotel);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -35,7 +39,9 @@ public class HotelController {
             @RequestParam(defaultValue = "0", required = false) Integer pageNum,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
             @RequestParam(defaultValue = "Ha Noi", required = false) String location) {
-        PaginationResponse<HotelRequest> pageHotelRequest = hotelService.findByLocation(pageNum, pageSize,
+        PaginationResponse<HotelRequest> pageHotelRequest = hotelService.findByLocation(
+                pageNum,
+                pageSize,
                 location);
         BaseHttpResponse response = new BaseHttpResponse(HttpStatus.OK.value(), pageHotelRequest);
         return ResponseEntity.status(HttpStatus.OK).body(response);

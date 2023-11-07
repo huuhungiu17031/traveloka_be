@@ -3,7 +3,6 @@ package com.traveloka_project.traveloka.security;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,16 +24,20 @@ import com.traveloka_project.traveloka.provider.CustomAuthenProvider;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Autowired
-    private CustomAuthenProvider customAuthenProvider;
+    private final String USER = "USER";
+    private final String ADMIN = "ADMIN";
+    private final CustomAuthenProvider customAuthenProvider;
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfig(CustomAuthenProvider customAuthenProvider, JwtFilter jwtFilter) {
+        this.customAuthenProvider = customAuthenProvider;
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    @Autowired
-    private JwtFilter jwtFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -57,7 +60,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET, "/user/refreshToken/**", "/user/info")
-                        .hasAnyRole("USER", "ADMIN")
+                        .hasAnyRole(USER, ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/hotel").hasRole(ADMIN)
                         .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

@@ -3,6 +3,8 @@ package com.traveloka_project.traveloka.payload.resquest;
 import java.util.List;
 
 import com.traveloka_project.traveloka.model.Hotel;
+import com.traveloka_project.traveloka.model.Location;
+import com.traveloka_project.traveloka.model.MediaFile;
 import com.traveloka_project.traveloka.model.Room;
 
 import lombok.Getter;
@@ -19,11 +21,11 @@ public class HotelRequest {
     private String name;
     private String address;
     private String description;
-    private Integer locationId;
+    private Location location;
     private String checkInInstruction;
     private Boolean status = false;
     private Integer price;
-    private List<Room> listRooms;
+    private List<MediaFile> listMediaFiles;
 
     public Hotel otd() {
         Hotel newHotel = new Hotel();
@@ -41,7 +43,7 @@ public class HotelRequest {
         this.name = hotel.getName();
         this.address = hotel.getAddress();
         this.description = hotel.getDescription();
-        this.locationId = hotel.getLocation().getId();
+        this.location = hotel.getLocation();
         this.checkInInstruction = hotel.getCheckInInstruction();
         this.status = hotel.getStatus();
         return this;

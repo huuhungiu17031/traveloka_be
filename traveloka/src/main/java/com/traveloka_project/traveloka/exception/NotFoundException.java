@@ -1,5 +1,8 @@
 package com.traveloka_project.traveloka.exception;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class NotFoundException extends RuntimeException {
 
     public NotFoundException(String message) {

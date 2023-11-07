@@ -12,4 +12,5 @@ public interface RefreshTokenService {
     RefreshToken handleGetNewRefreshToken(String token);
 
     void provokeToken(String token);
+    
 }

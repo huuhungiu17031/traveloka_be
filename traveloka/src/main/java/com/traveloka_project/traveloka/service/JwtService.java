@@ -8,6 +8,7 @@ import com.traveloka_project.traveloka.payload.response.JwtResponse;
 import io.jsonwebtoken.Claims;
 
 public interface JwtService {
+
     String generateToken(String email, Map<String, Object> extraClaims);
 
     Claims extractAllClaims(String token);
@@ -19,4 +20,5 @@ public interface JwtService {
     JwtResponse getNewJwtToken(String token);
 
     JwtResponse generateJwtResponse(String email, List<String> roles);
+    
 }

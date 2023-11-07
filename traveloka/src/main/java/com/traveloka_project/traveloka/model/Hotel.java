@@ -22,11 +22,12 @@ public class Hotel {
     private String description;
     private String checkInInstruction;
     private Boolean status = false;
+    private String listMediaFile;
 
     @OneToMany(mappedBy = "hotel")
     private List<Room> listRoom;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "location_id")
     private Location location;
 }
