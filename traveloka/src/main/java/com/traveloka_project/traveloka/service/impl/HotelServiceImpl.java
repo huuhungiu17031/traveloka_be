@@ -62,24 +62,36 @@ public class HotelServiceImpl implements HotelService {
     public PaginationResponse<HotelRequest> findByLocation(Integer pageNum, Integer pageSize, String location) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         String lowerCaseString = location.toLowerCase();
+
         Page<Hotel> pageHotel = hotelRepository.findByLocation_Name(lowerCaseString, pageable);
+
         List<HotelRequest> hotelRequests = pageHotel.getContent().stream()
-                .map(hotel -> {
-                    HotelRequest hotelRequest = new HotelRequest();
-                    List<Integer> listIdImage = gson.fromJson(hotel.getListMediaFile(), new TypeToken<List<Integer>>(){}.getType());
-                    List<MediaFile> listMediaFile = listIdImage.stream().map(id -> mediaFileService.findById(id))
-                            .collect(Collectors.toList());
-                    hotelRequest.setListMediaFiles(listMediaFile);
-                    return hotelRequest.dto(hotel);
-                })
+                .map(hotel -> mapToHotelRequest(hotel))
                 .collect(Collectors.toList());
-        PaginationResponse<HotelRequest> pageHotelRequest = new PaginationResponse(
+
+        PaginationResponse<HotelRequest> pageHotelRequest = new PaginationResponse<>(
                 pageNum,
                 pageSize,
                 pageHotel.getTotalElements(),
                 pageHotel.getTotalPages(),
                 pageHotel.isLast());
         pageHotelRequest.setContent(hotelRequests);
+
         return pageHotelRequest;
     }
+
+    private HotelRequest mapToHotelRequest(Hotel hotel) {
+        HotelRequest hotelRequest = new HotelRequest();
+        List<Integer> listIdImage = gson.fromJson(hotel.getListMediaFile(), new TypeToken<List<Integer>>() {
+        }.getType());
+
+        List<MediaFile> listMediaFile = listIdImage.stream()
+                .map(id -> mediaFileService.findById(id))
+                .collect(Collectors.toList());
+
+        hotelRequest.setListMediaFiles(listMediaFile);
+
+        return hotelRequest.dto(hotel);
+    }
+
 }

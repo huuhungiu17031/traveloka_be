@@ -5,8 +5,6 @@ import java.util.List;
 import com.traveloka_project.traveloka.model.Hotel;
 import com.traveloka_project.traveloka.model.Location;
 import com.traveloka_project.traveloka.model.MediaFile;
-import com.traveloka_project.traveloka.model.Room;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
